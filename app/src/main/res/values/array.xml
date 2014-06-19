@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="number_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+    <string-array name="size_array">
+        <item>Small</item>
+        <item>Medium</item>
+        <item>Large</item>
+        <item>Extra-large</item>
+    </string-array>
+    <string-array name="type_array">
+        <item>Faces</item>
+        <item>Photos</item>
+        <item>Clip art</item>
+        <item>Line Art</item>
+    </string-array>
+    <string-array name="type_array_values">
+        <item>Small</item>
+        <item>Medium</item>
+        <item>Large</item>
+        <item>Extra-large</item>
+    </string-array>
+</resources>

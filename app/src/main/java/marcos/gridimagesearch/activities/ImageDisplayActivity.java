@@ -1,4 +1,4 @@
-package marcos.gridimagesearch;
+package marcos.gridimagesearch.activities;
 
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
@@ -8,6 +8,7 @@ import android.view.MenuItem;
 
 import com.loopj.android.image.SmartImageView;
 
+import marcos.gridimagesearch.models.ImageResult;
 import marcos.gridimagesearch.R;
 
 public class ImageDisplayActivity extends ActionBarActivity {

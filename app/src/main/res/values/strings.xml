@@ -7,5 +7,7 @@
     <string name="btn_search">Search</string>
     <string name="edt_query_hint">Enter search term</string>
     <string name="title_activity_image_display">ImageDisplayActivity</string>
+    <string name="title_activity_settings">SettingsActivity</string>
+
 
 </resources>

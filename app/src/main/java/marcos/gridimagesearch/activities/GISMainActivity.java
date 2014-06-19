@@ -1,15 +1,15 @@
-package marcos.gridimagesearch;
+package marcos.gridimagesearch.activities;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
@@ -24,6 +24,10 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import marcos.gridimagesearch.models.ImageResult;
+import marcos.gridimagesearch.marcos.gridimagesearch.adapters.ImageResultArrayAdapter;
+import marcos.gridimagesearch.R;
+
 
 public class GISMainActivity extends ActionBarActivity  {
     private EditText mQueryText;
@@ -31,12 +35,17 @@ public class GISMainActivity extends ActionBarActivity  {
     private Button mSearchButton;
     private ArrayList<ImageResult> mImageResults = new ArrayList<ImageResult>();
     private ImageResultArrayAdapter adapter;
+    private SharedPreferences mSharedPreferences;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gismain);
 
         setupViews();
+
+        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
 
         adapter = new ImageResultArrayAdapter(this, mImageResults);
         mGVResults.setAdapter(adapter);
@@ -53,6 +62,18 @@ public class GISMainActivity extends ActionBarActivity  {
                 startActivity(intent);
             }
         });
+
+
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        String value = mSharedPreferences.getString("lt_size", "invalid");
+        Toast.makeText(this, "this is the result " + value, Toast.LENGTH_LONG).show();
+
 
 
     }
@@ -108,6 +129,7 @@ public class GISMainActivity extends ActionBarActivity  {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_settings) {
+            startActivity(new Intent(this, SettingsActivity.class));
             return true;
         }
         return super.onOptionsItemSelected(item);

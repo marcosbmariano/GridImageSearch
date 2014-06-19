@@ -1,6 +1,4 @@
-package marcos.gridimagesearch;
-
-import android.util.Log;
+package marcos.gridimagesearch.models;
 
 import org.json.JSONArray;
 import org.json.JSONException;

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <EditTextPreference
+        android:key="et_site"
+        android:title="Write something for the site"
+        android:summary="choose the site"
+        />
+    <ListPreference
+        android:key="lt_size"
+        android:title="Size"
+        android:summary="Choose the size of the picture"
+        android:entries="@array/size_array"
+        android:entryValues="@array/number_values"
+
+        />
+    <ListPreference
+        android:key="lt_type"
+        android:title="Type"
+        android:summary="Choose the type of the picture"
+        android:entries="@array/type_array"
+        android:entryValues="@array/number_values"
+
+        />
+
+
+
+</PreferenceScreen>
