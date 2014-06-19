@@ -3,12 +3,10 @@ package marcos.gridimagesearch.activities;
 import android.content.SharedPreferences;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
-
 import marcos.gridimagesearch.R;
 
 public class SettingsActivity extends PreferenceActivity

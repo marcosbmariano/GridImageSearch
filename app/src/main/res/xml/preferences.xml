@@ -6,13 +6,13 @@
         android:title="Write something for the site"
         android:summary="choose the site"
         />
+
     <ListPreference
         android:key="lt_size"
         android:title="Size"
         android:summary="Choose the size of the picture"
         android:entries="@array/size_array"
         android:entryValues="@array/number_values"
-
         />
     <ListPreference
         android:key="lt_type"
@@ -20,9 +20,14 @@
         android:summary="Choose the type of the picture"
         android:entries="@array/type_array"
         android:entryValues="@array/number_values"
-
         />
 
-
+    <ListPreference
+        android:key="lt_color"
+        android:title="Color"
+        android:summary="Choose the size of the picture"
+        android:entries="@array/color_array"
+        android:entryValues="@array/color_array"
+        />
 
 </PreferenceScreen>

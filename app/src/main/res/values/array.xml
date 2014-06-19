@@ -7,21 +7,28 @@
         <item>3</item>
     </string-array>
     <string-array name="size_array">
-        <item>Small</item>
-        <item>Medium</item>
-        <item>Large</item>
-        <item>Extra-large</item>
+        <item>small</item>
+        <item>medium</item>
+        <item>large</item>
+        <item>xlarge</item>
     </string-array>
     <string-array name="type_array">
-        <item>Faces</item>
-        <item>Photos</item>
-        <item>Clip art</item>
-        <item>Line Art</item>
+        <item>face</item>
+        <item>photo</item>
+        <item>clipart</item>
+        <item>lineart</item>
     </string-array>
-    <string-array name="type_array_values">
-        <item>Small</item>
-        <item>Medium</item>
-        <item>Large</item>
-        <item>Extra-large</item>
+    <string-array name="color_array">
+        <item>blue</item>
+        <item>brown</item>
+        <item>gray</item>
+        <item>orange</item>
+        <item>black</item>
+        <item>pink</item>
+        <item>purple</item>
+        <item>red</item>
+        <item>teal</item>
+        <item>white</item>
+        <item>yellow</item>
     </string-array>
 </resources>

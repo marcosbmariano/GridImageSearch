@@ -1,5 +1,6 @@
 package marcos.gridimagesearch.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -36,7 +37,8 @@ public class GISMainActivity extends ActionBarActivity  {
     private ArrayList<ImageResult> mImageResults = new ArrayList<ImageResult>();
     private ImageResultArrayAdapter adapter;
     private SharedPreferences mSharedPreferences;
-
+    private String mSize, mType, mColor, mSite;
+    private SharedPreferences prefs;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,9 +46,13 @@ public class GISMainActivity extends ActionBarActivity  {
 
         setupViews();
 
+        setupmGVResults();
+
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
+    }
 
+    public void setupmGVResults(){
         adapter = new ImageResultArrayAdapter(this, mImageResults);
         mGVResults.setAdapter(adapter);
         mGVResults.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -54,28 +60,40 @@ public class GISMainActivity extends ActionBarActivity  {
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
 
                 Intent intent = new Intent(getApplicationContext(),ImageDisplayActivity.class);
-
                 ImageResult imageResult = mImageResults.get(position);
-
                 intent.putExtra("result",imageResult);
-
                 startActivity(intent);
+
             }
         });
 
-
     }
 
+    public void getSettings(){
+        mSize = mSharedPreferences.getString("lt_size", "");
+        mSite = mSharedPreferences.getString("et_site","");
+        mColor = mSharedPreferences.getString("lt_color","");
+        mType = mSharedPreferences.getString("lt_type", "");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mSharedPreferences.edit().putString("query", mQueryText.getText().toString()).commit();
+
+    }
 
     @Override
     protected void onResume() {
         super.onResume();
 
-        String value = mSharedPreferences.getString("lt_size", "invalid");
-        Toast.makeText(this, "this is the result " + value, Toast.LENGTH_LONG).show();
+        getSettings();
+
+        mQueryText.setText(mSharedPreferences.getString("query",""));
 
 
 
+//
     }
 
     public void setupViews(){
@@ -83,6 +101,9 @@ public class GISMainActivity extends ActionBarActivity  {
         mGVResults = (GridView)findViewById(R.id.gvResults);
         mSearchButton = (Button)findViewById(R.id.btnSearch);
     }
+
+
+    //imgsz=small|medium|large|xlarge
 
 
 
@@ -93,8 +114,11 @@ public class GISMainActivity extends ActionBarActivity  {
 
         String natanString ="https://ajax.googleapis.com/ajax/services/search/images?rsz=&&" + "start="
                 + 0 + "&v=1.0&q=";
-        client.get("https://ajax.googleapis.com/ajax/services/search/images?start0&v=1.0&q="
-                        + Uri.encode(query), new JsonHttpResponseHandler(){
+        client.get("https://ajax.googleapis.com/ajax/services/search/images?rsz=8&start0" +
+                "&imgcolor=" + mColor  +
+                "&imgsz=" + mSize +
+                "&imgtype=" + mType +
+                "&v=1.0&q="+ Uri.encode(query), new JsonHttpResponseHandler(){
             @Override
             public void onSuccess(JSONObject response) {
                 JSONArray imageJsonResultsArray = null;
@@ -105,12 +129,17 @@ public class GISMainActivity extends ActionBarActivity  {
 
                     mImageResults.clear();//clear list
                     adapter.addAll(ImageResult.fromJsonArray(imageJsonResultsArray));
+                    adapter.addAll(ImageResult.fromJsonArray(imageJsonResultsArray));
+                    adapter.addAll(ImageResult.fromJsonArray(imageJsonResultsArray));
+
 
                 }catch (JSONException e){
                     e.printStackTrace();
                 }
             }
         });
+
+
 
     }
 
