@@ -14,6 +14,8 @@
         android:layout_height="wrap_content"
         android:maxWidth="600dp"
         android:src="@android:drawable/screen_background_light"
-        />
+        android:onClick="onShareItem" />
+
+
 
 </RelativeLayout>

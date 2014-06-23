@@ -3,11 +3,17 @@ package marcos.gridimagesearch.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.preference.PreferenceManager;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.widget.SearchView;
 import android.view.Menu;
+
+
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -25,20 +31,23 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import marcos.gridimagesearch.marcos.gridimagesearch.helpers.EndlessScrollListener;
 import marcos.gridimagesearch.models.ImageResult;
 import marcos.gridimagesearch.marcos.gridimagesearch.adapters.ImageResultArrayAdapter;
 import marcos.gridimagesearch.R;
 
 
 public class GISMainActivity extends ActionBarActivity  {
-    private EditText mQueryText;
     private GridView mGVResults;
-    private Button mSearchButton;
     private ArrayList<ImageResult> mImageResults = new ArrayList<ImageResult>();
-    private ImageResultArrayAdapter adapter;
+    private ImageResultArrayAdapter mAdapter;
     private SharedPreferences mSharedPreferences;
-    private String mSize, mType, mColor, mSite;
-    private SharedPreferences prefs;
+    private String mSize, mType, mColor, mSite, mQuery;
+    private AsyncHttpClient mClient;
+    private int mPageStart;
+    private SearchView mSearchView;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,11 +59,12 @@ public class GISMainActivity extends ActionBarActivity  {
 
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
+
     }
 
     public void setupmGVResults(){
-        adapter = new ImageResultArrayAdapter(this, mImageResults);
-        mGVResults.setAdapter(adapter);
+        mAdapter = new ImageResultArrayAdapter(this, mImageResults);
+        mGVResults.setAdapter(mAdapter);
         mGVResults.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
@@ -66,6 +76,28 @@ public class GISMainActivity extends ActionBarActivity  {
 
             }
         });
+
+        mGVResults.setOnScrollListener( new EndlessScrollListener(18){
+
+            @Override
+            public void onLoadMore(int page, int totalItemsCount) {
+                // Triggered only when new data needs to be appended to the list
+                // Add whatever code is needed to append new items to your AdapterView
+
+                customLoadMoreDataFromApi(page);
+
+                // or customLoadMoreDataFromApi(totalItemsCount);
+            }
+        });
+
+    }
+
+    public void customLoadMoreDataFromApi(int page){
+        // This method probably sends out a network request and appends new data items to your adapter.
+        // Use the offset value and add it as a parameter to your API request to retrieve paginated data.
+        // Deserialize API response and then construct new objects to append to the adapter
+        mPageStart += 8;
+        httpClientGetResult();
 
     }
 
@@ -79,7 +111,8 @@ public class GISMainActivity extends ActionBarActivity  {
     @Override
     protected void onPause() {
         super.onPause();
-        mSharedPreferences.edit().putString("query", mQueryText.getText().toString()).commit();
+        mSharedPreferences.edit().putString(
+                "query", mQuery ).commit();
 
     }
 
@@ -89,66 +122,111 @@ public class GISMainActivity extends ActionBarActivity  {
 
         getSettings();
 
-        mQueryText.setText(mSharedPreferences.getString("query",""));
-
-
-
 //
     }
 
     public void setupViews(){
-        mQueryText = (EditText)findViewById(R.id.etQuery);
+
         mGVResults = (GridView)findViewById(R.id.gvResults);
-        mSearchButton = (Button)findViewById(R.id.btnSearch);
+
     }
 
 
-    //imgsz=small|medium|large|xlarge
+
+    public void onImageSearch(){
+
+        mPageStart = 0;
+        mImageResults.clear();//clear list
+        mAdapter.notifyDataSetChanged();
+
+        mClient = new AsyncHttpClient();
+
+        httpClientGetResult();
+    }
+
+    private void httpClientGetResult(){
+
+        if (hasInternetConnection()) {
+
+            mClient.get("https://ajax.googleapis.com/ajax/services/search/images?" +
+                    "rsz=" + 8 +
+                    "&start=" + mPageStart +
+                    "&imgcolor=" + mColor +
+                    "&imgsz=" + mSize +
+                    "&imgtype=" + mType +
+                    "&as_sitesearch=" + mSite +
+                    "&v=1.0&q=" + Uri.encode(mQuery), new JsonHttpResponseHandler() {
+                @Override
+                public void onSuccess(JSONObject response) {
+                    JSONArray imageJsonResultsArray = null;
+                    try {
+                        imageJsonResultsArray =
+                                response.getJSONObject("responseData").getJSONArray("results");
+
+                        mAdapter.addAll(ImageResult.fromJsonArray(imageJsonResultsArray));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        }else{
+            Toast.makeText(getBaseContext(),"No internet connection!", Toast.LENGTH_LONG).show();
+        }
+    }
 
 
+    public boolean hasInternetConnection() {
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 
-    public void onImageSearch(View v){
-        String query = mQueryText.getText().toString();
+        if (connectivityManager != null) {
+            NetworkInfo[] networkInfo = connectivityManager.getAllNetworkInfo();
 
-        AsyncHttpClient client = new AsyncHttpClient();
-
-        String natanString ="https://ajax.googleapis.com/ajax/services/search/images?rsz=&&" + "start="
-                + 0 + "&v=1.0&q=";
-        client.get("https://ajax.googleapis.com/ajax/services/search/images?rsz=8&start0" +
-                "&imgcolor=" + mColor  +
-                "&imgsz=" + mSize +
-                "&imgtype=" + mType +
-                "&v=1.0&q="+ Uri.encode(query), new JsonHttpResponseHandler(){
-            @Override
-            public void onSuccess(JSONObject response) {
-                JSONArray imageJsonResultsArray = null;
-
-                try{
-                    imageJsonResultsArray =
-                            response.getJSONObject("responseData").getJSONArray("results");
-
-                    mImageResults.clear();//clear list
-                    adapter.addAll(ImageResult.fromJsonArray(imageJsonResultsArray));
-                    adapter.addAll(ImageResult.fromJsonArray(imageJsonResultsArray));
-                    adapter.addAll(ImageResult.fromJsonArray(imageJsonResultsArray));
-
-
-                }catch (JSONException e){
-                    e.printStackTrace();
+            if (networkInfo != null) {
+                for (int i = 0; i < networkInfo.length; i++) {
+                    if (networkInfo[i].getState() == NetworkInfo.State.CONNECTED) {
+                        return true;
+                    }
                 }
             }
-        });
-
-
-
+        }
+        return false;
     }
+
 
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.gismain, menu);
-        return true;
+       //MenuInflater inflater = getMenuInflater();
+       //inflater.inflate(R.menu.gismain, menu);
+        getMenuInflater().inflate(R.menu.gismain,menu);
+
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        mSearchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+
+
+        if (mSearchView == null){
+            Toast.makeText(getBaseContext(), "is null", Toast.LENGTH_LONG).show();
+        }
+
+        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                mQuery = s;
+                onImageSearch();
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String s) {
+
+                return false;
+            }
+        });
+
+
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -156,15 +234,21 @@ public class GISMainActivity extends ActionBarActivity  {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
+
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            startActivity(new Intent(this, SettingsActivity.class));
-            return true;
+
+        switch (id){
+            case R.id.action_settings:
+                startActivity(new Intent(this, SettingsActivity.class));
+                return true;
+            case R.id.action_search:
+
+                return true;
         }
-        return super.onOptionsItemSelected(item);
+
+
+        return false;
     }
-
-
 
 
 }

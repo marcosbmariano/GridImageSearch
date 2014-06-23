@@ -3,8 +3,9 @@
 
     <EditTextPreference
         android:key="et_site"
-        android:title="Write something for the site"
+        android:title="Choose the site"
         android:summary="choose the site"
+        android:defaultValue=""
         />
 
     <ListPreference
