@@ -35,6 +35,7 @@ public class ImageDisplayActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_image_display);
 
+        //get ImageResult from intent
         Intent intent = getIntent();
         ImageResult imageResult = (ImageResult)intent.getSerializableExtra("result");
 
@@ -47,10 +48,8 @@ public class ImageDisplayActivity extends ActionBarActivity {
     public void onShareItem(View v){
 
         // Get access to bitmap image from view
-        SmartImageView smartImageView = (SmartImageView) findViewById(R.id.ivResult);
-
-        Bitmap bmp = getImageBitmapFromImageView(smartImageView);
-
+        Bitmap bmp = getImageBitmapFromImageView(mImage);
+        //get Uri from image
         Uri bmpUri = getLocalBitmapUri(bmp);
 
         shareImage(bmpUri);
@@ -112,10 +111,8 @@ public class ImageDisplayActivity extends ActionBarActivity {
 
         if(drawable instanceof BitmapDrawable){
             bmp = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
-        }else{
-            Toast.makeText(this, "Image is not a instance of Bitmap", Toast.LENGTH_LONG).show();
-            return null;
         }
+
         return bmp;
     }
 
